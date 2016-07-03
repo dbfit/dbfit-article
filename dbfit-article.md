@@ -38,7 +38,7 @@ can access it using your browser at <http://localhost:8085/>.
 ## Creating a new test page
 
 Open <http://localhost:8085/HelloWorldTest> in your browser. You should see an
-editor where you can create your test page.
+editor where you can create and run your test page.
 
 Test pages are described in FitNesse Wiki syntax which is essentially a simple
 text format for describing commands in terms of tables. The premise is that this
@@ -52,6 +52,13 @@ Although FitNesse Wiki syntax is really simple, you do not have to use it to wri
 
 Test pages are stored on the file system in simple text format. You can create and edit them directly
 using your favorite text editor.
+
+
+## Running tests
+
+To run a test page you can click `Test` test button in FitNesse. It's possible to run all tests
+within a suite and it's also possible to trigger tests execution via REST API or via JUnit,
+allowing you to automate DbFit tests execution and integration with a CI server.
 
 ## Configuration
 
@@ -68,7 +75,8 @@ the correct libraries by including the following command:
 
     !path lib/*.jar
 
-## Connecting to the database
+Connecting to the database
+==========================
 
 DbFit supports two modes of operation: Flow and Standalone. By default, each individual
 test page in flow mode is executed in a transaction that is automatically rolled back after
@@ -94,8 +102,39 @@ And here is how to open a connection in standalone mode:
     !|DatabaseEnvironment|MySql|
     |Connect|localhost|dbfit_user|password|dbfit|
 
+
+There is support for configuring the connection details in separate file. Encryption of the database
+password is also supported so that you can avoid storing it in plain text.
+
 ## Supported databases
 
-Following database systems are currently supported by DbFit: Oracle, SQLServer2005andlater, MySQL, Postgres, Derby, HSQLDB, DB2, DB2i, Teradata, Netezza, Informix.
+Following database systems are currently supported by DbFit: Oracle, SQL Server, MySQL, Postgres, Derby, HSQLDB, DB2, DB2i, Teradata, Netezza, Informix.
+
+Quick reference of the mostly used commands
+===========================================
+
+## DML and DDL statements
+
+## Query, Copmpare Stored Queries
+
+## Working with parameters
+
+Some limitations
+================
+
+* User defined abstract database types are not fully supported.
+
+* The declarative syntax might be insufficient if you need low level control in your tests,
+coding some logic, testing behaviour of multiple concurrent connections: DbFit syntax may be insufficient. For more
+complicated scenarios you may need to develop your custom fixtures or to use other tools for the purpose.
+
+* Not intended for performance testing. (Though there are some guidelines if you need to compare larger datasets).
+
+* FIT runner is required, Slim is not supported.
 
 
+Contributing to the project
+===========================
+
+Check out the project on Github and the published CONTRIBUTING guidelines. The project is open for contributors, you may submit
+your issue, pull request to Github or ask a question in the mailing list.
