@@ -9,6 +9,9 @@ database testing – in order to motivate database developers to use an
 automated testing framework. DbFit is based on FitNesse framework which
 enables defining tests in readable and easy to maintain tabular format.
 
+DBFit supports multiple relational databases, including Oracle, MS SQL Server,
+MySQL, PostgreSQL and others.
+
 Web site: <http://dbfit.github.io/dbfit/>
 
 Version tested: 3.2.0
@@ -109,6 +112,10 @@ password is also supported so that you can avoid storing it in plain text.
 ## Supported databases
 
 Following database systems are currently supported by DbFit: Oracle, SQL Server, MySQL, Postgres, Derby, HSQLDB, DB2, DB2i, Teradata, Netezza, Informix.
+## Basic cycle of a DbFit test and its execution
+
+1. Set up the input data and other context. DbFit commands typically used at this stage: `Insert`, `Update`, `ExecuteDdl`, `Execute`. If common set up steps are used by several tests - it may be useful to keep them in SetUp page which will be automatically included in the beginning of the other tests in the suite.
+2. Execute a database operation which we want to test (typically - a stored function or procedure). Useful DbFit commands: `Execute Procedure`.
 
 Quick reference of the mostly used commands
 ===========================================
