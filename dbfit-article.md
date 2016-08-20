@@ -60,7 +60,7 @@ using your favorite text editor.
 ## Running tests
 
 To run a test page you can click `Test` test button in FitNesse. It's possible to run all tests
-within a suite and it's also possible to trigger tests execution via REST API or via JUnit,
+within a suite and it's also possible to trigger tests execution via REST API, JUnit or a command line
 allowing you to automate DbFit tests execution and integration with a CI server.
 
 ## Configuration
@@ -77,6 +77,8 @@ the correct libraries by including the following command:
 
 
     !path lib/*.jar
+
+This command can be placed directly into a test page or in a parent page in the test suite hierarchy.
 
 Connecting to the database
 ==========================
@@ -116,8 +118,8 @@ Following database systems are currently supported by DbFit: Oracle, SQL Server,
 ## Basic cycle of a DbFit test and its execution
 
 1. Set up the input data and other context. DbFit commands typically used at this stage: `Insert`, `Update`, `ExecuteDdl`, `Execute`. If common set up steps are used by several tests - it may be useful to keep them in `SetUp` page which will be automatically included in the beginning of the other tests in the suite.
-2. Execute a database operation which we want to test (typically - a stored function or procedure). Useful DbFit commands: `Execute Procedure`.
-3. Verify the result - comparing the actual versus the expected result. Useful DbFit commands: `Query`, `Compare Stored Queries`
+2. Execute a database operation which we want to test (typically - a stored function or procedure, or an external process such as an ETL tool routine). Useful DbFit commands: `Execute Procedure`.
+3. Verify the result - comparing the actual versus the expected result. Useful DbFit commands: `Query`, `Store Query`, `Compare Stored Queries`
 4. Tear Down - clean up the changes in order to avoid affecting other tests. Pages named `TearDown` are automatically included at the end of all tests in the suite. In Flow Mode the active transaction is automatically rolled back at the end of the test page so often you won't need any explicit tear down steps (assuming you don't commit transactions in your tests).
 
 Quick reference of the mostly used commands
