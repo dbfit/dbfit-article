@@ -210,9 +210,35 @@ You can use multiple columns for both updating and selecting, and even use the s
     |26                                   |
 
 
+## Execute Procedure
+
+`Execute Procedure` executes a stored procedure or function for each row of data table, binding input/output parameters to columns of the data table, eg:
+
+    !|Execute Procedure|ConcatenateStrings   |
+    |first_string|second_string|concatenated?|
+    |Hello       |World        |Hello World  |
+    |Ford        |Prefect      |Ford Prefect |
+
+If a function is getting called, then a column containing just the question mark is used for function results.
+
+    !|Execute Procedure|ConcatenateF        |
+    |first_string|second_string|?           |
+    |Hello       |World        |Hello World |
+    |Ford        |Prefect      |Ford Prefect|
+
+To use IN/OUT parameters, you’ll need to specify the parameter twice. Once without the question mark, when it is used as the input; and one with the question mark when it is used as output:
+
+    |Execute Procedure|Multiply|
+    |factor|val|val?           |
+    |5     |10 |50             |
+
+To determine the test result - the actual output and return values are compared with the specified expected ones.
+
+There is a variant `Execute Procedure Expect Exception` in case you expect your stored procedure to raise an exception.
+
 ## Parameters and fixture symbols
 
-DbFit enables you to use Fixture symbols as global variables during test execution, to store or read intermediate results. In order to store a parameter from a query - you can use `>>parameter` syntax, and `<<parameter` to read the value. In addition, you can use the `Set Parameter` command to explicitly set a parameter value to a string.
+DbFit enables you to use Fixture symbols as global variables during test execution, to store or read intermediate results. In order to store a parameter from a `Query` or `Execute Procedure` - you can use `>>parameter` syntax, and `<<parameter` to read the value. In addition, you can use the `Set Parameter` command to explicitly set a parameter value to a string.
 
 
     !|Set Parameter|ONE|1|
