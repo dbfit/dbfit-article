@@ -3,20 +3,22 @@ DbFit
 Introduction
 ============
 
-DbFit is an open source tool for automated database testing. DbFit has
+DbFit is an open source tool for automated database testing. It has
 been initially created by Gojko Adzic with the goal to enable efficient
 database testing – in order to motivate database developers to use an
 automated testing framework. DbFit is based on FitNesse framework which
 enables defining tests in readable and easy to maintain tabular format.
 
-DBFit supports multiple relational databases, including Oracle, MS SQL Server,
+Multiple relational databases are supported, including Oracle, MS SQL Server,
 MySQL, PostgreSQL and others.
 
 Web site: <http://dbfit.github.io/dbfit/>
 
 Version tested: 3.2.0
 
-License and Pricing: Open Source, GPL v2
+System requirements: Java Runtime Environment 7 or higher
+
+License and Pricing: Free and Open Source, GPL v2
 
 Support: dbfit google group (<http://groups.google.com/group/dbfit>) and
 GitHub issue tracker (<https://github.com/dbfit/dbfit/issues>)
@@ -29,14 +31,14 @@ Getting Started
 
 In order to run DbFit you need Java Runtime Environment (JRE) 7 or
 higher which you may get from Oracle's web site. Also you’ll need
-to ensure the database accounts and connectivity to the databases
+to ensure the accounts and connectivity to the databases
 which you want to access with DbFit.
 
-To install DbFit you can download it from DbFit web site
+To install DbFit you can download it from its web site
 <http://dbfit.github.io/dbfit/> unpack the archive and run
-startFitnesse.sh or startFitnesse.bat (depending on your operating
+`startFitnesse.sh` or `startFitnesse.bat` (depending on your operating
 system). It may take it a few seconds to start the server and then you
-can access it using your browser at <http://localhost:8085/>.
+can access it using your browser at <http://localhost:8085/>. You'll be able to access some built-in reference documentation and examples from that web page.
 
 ## Creating a new test page
 
@@ -61,15 +63,14 @@ using your favorite text editor.
 
 To run a test page you can click `Test` test button in FitNesse. It's possible to run all tests
 within a suite and it's also possible to trigger tests execution via REST API, JUnit or a command line
-allowing you to automate DbFit tests execution and integration with a CI server.
+allowing you to automate running DbFit tests and integration with a CI server.
 
 ## Configuration
 
-For details about configuring different port number, project folder
-or other settings you may consult FitNesse documentation.
+For details about configuring different port number, project folder or other settings you may examine the `startFitnesse` script and its `--help` option output, `plugins.properties` file, and also consult FitNesse documentation.
 
 Due to licensing restrictions the drivers of some of the supported databases
-are not being shipped with DbFit so you'll need to also provide the required
+are not being shipped with DbFit so you'll need to provide the required additional
 JDBC driver jar files by copying them into DbFit lib folder.
 
 In order to load the DbFit extension into FitNesse, your test pages have to load
@@ -83,7 +84,7 @@ This command can be placed directly into a test page or in a parent page in the 
 Connecting to the database
 ==========================
 
-DbFit supports two modes of operation: Flow and Standalone. By default, each individual
+DbFit supports two modes of operation - Flow and Standalone. By default, each individual
 test page in flow mode is executed in a transaction that is automatically rolled back after
 the test. In standalone mode, you are responsible for overall transaction control. Most of the
 commands are common for both modes but there are some limitations in standalone mode and also
@@ -193,7 +194,7 @@ You can use multiple columns for both updating and selecting, and even use the s
     !|Execute|insert into test_table(name, age) values (:name, 10)|
 
 
-`Execute Ddl` is intended for executing DDL SQL statements (like `create`, `alter, `drop`). It’s similar to Execute with the main difference that it does not support bind variables, and also automatically handles required post-execute activities, if any (e.g. Teradata requires transaction to be closed after each DDL statement).
+`Execute Ddl` is intended for executing DDL SQL statements (like `create`, `alter`, `drop`). It's similar to Execute with the main difference that it does not support bind variables, and also automatically handles required post-execute activities, if any (e.g. Teradata requires transaction to be closed after each DDL statement).
 
 
     !|Execute Ddl|create table tab_with_trigger(x int)|
@@ -209,9 +210,36 @@ You can use multiple columns for both updating and selecting, and even use the s
     |26                                   |
 
 
+## Execute Procedure
+
+`Execute Procedure` executes a stored procedure or function for each row of data table, binding input/output parameters to columns of the data table, eg:
+
+    !|Execute Procedure|ConcatenateStrings   |
+    |first_string|second_string|concatenated?|
+    |Hello       |World        |Hello World  |
+    |Ford        |Prefect      |Ford Prefect |
+
+If a function is getting called, then a column containing just the question mark is used for function results.
+
+    !|Execute Procedure|ConcatenateF        |
+    |first_string|second_string|?           |
+    |Hello       |World        |Hello World |
+    |Ford        |Prefect      |Ford Prefect|
+
+To use IN/OUT parameters, you’ll need to specify the parameter twice. Once without the question mark, when it is used as the input; and one with the question mark when it is used as output:
+
+    |Execute Procedure|Multiply|
+    |factor|val|val?           |
+    |5     |10 |50             |
+
+To determine the test result - the actual output and return values are compared with the specified expected ones.
+
+There is a variant `Execute Procedure Expect Exception` in case you expect your stored procedure to raise an exception.
+
 ## Parameters and fixture symbols
 
-DbFit enables you to use Fixture symbols as global variables during test execution, to store or read intermediate results. In order to store a parameter from a query - you can use `>>parameter` syntax, and `<<parameter` to read the value. In addition, you can use the `Set Parameter` command to explicitly seta parameter value to a string.
+DbFit enables you to use Fixture symbols as global variables during test execution, to store or read intermediate results. In order to store a parameter from a `Query` or `Execute Procedure` - you can use `>>parameter` syntax, and `<<parameter` to read the value. In addition, you can use the `Set Parameter` command to explicitly set a parameter value to a string.
+
 
     !|Set Parameter|ONE|1|
 
@@ -219,17 +247,23 @@ DbFit enables you to use Fixture symbols as global variables during test executi
     |mytime?                               |
     |>>current_time                        |
 
-    !|Query|select to_char(count(*)) as cnt from dual where sysdate >= :current_time|
-    |cnt                                                                            |
-    |<<ONE                                                                          |
+    !|Query|select '1' as cnt from dual where sysdate >= :current_time|
+    |cnt                                                              |
+    |<<ONE                                                            |
 
+
+Advanced use cases
+==================
+
+Depending on your needs, you may find out that you need a functionality which is beyond what's currently supported by DbFit. These are more advanced use cases which are out of scope of this article, we'll just outline two possible extension points:
+
+* You can integrate other Fit fixtures in our tests - e.g. to run an external application which loads a file into the database.
+* You may also extend DbFit by developing your custom fixtures or database adapters.
 
 Contributing to the project
 ===========================
 
-Check out the project on Github and the published CONTRIBUTING guidelines. The project is open for contributors, you may submit
-your issue, pull request to Github or ask a question in the mailing list.
-
+DbFit is open for contribution - whether you'd like to extend the functionality, fix a bug, improve the documentation, suggest an idea, report a problem, ask a question, or share a feedback. You may submit your issue or open a pull request at Github or you can post your question in the mailing list. Check out the project on Github and the published CONTRIBUTING guidelines for more details.
 
 Some limitations
 ================
@@ -259,3 +293,11 @@ Some Benefits
 
 As a general conclusion, when appropriately used DbFit can help improving the quality, design and maintainability of your product. It enables practices like Test-Driven Development, refactoring. DbFit tests may serve as living executable documentation of your system behavior.
 
+References
+==========
+* Dbfit web site - <http://dbfit.github.io/dbfit>
+* DbFit at Github - <https://github.com/dbfit/dbfit>
+* A presentation and demo about TDD with DbFit and Oracle - <https://github.com/javornikolov/tdd-with-dbfit-bgoug-201305>
+* FitNesse framework - <http://www.fitnesse.org>
+* Fit and Slim test systems - <http://fitnesse.org/FitNesse.FullReferenceGuide.UserGuide.WritingAcceptanceTests.TestSystems>
+* Java download page - <http://www.oracle.com/technetwork/java/javase/downloads/index.html>
